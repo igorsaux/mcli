@@ -485,8 +485,9 @@ async function runCmd(args: string[], cache: Cache): Promise<boolean> {
   const uuid =
     manifest.minecraft.args?.uuid || "019dd51d-ffff-799e-906b-30e005c5db99";
   const accessToken = manifest.minecraft.args?.accessToken || "foobar";
-  const clientId = manifest.minecraft.args?.clientId || "mcli";
   const xuid = manifest.minecraft.args?.xuid || "0";
+  const mainClass = manifest.minecraft.mainClass || gameManifest.mainClass;
+
   let classpath = "";
 
   {
@@ -495,6 +496,10 @@ async function runCmd(args: string[], cache: Cache): Promise<boolean> {
 
     for await (const file of glob.scan("libraries")) {
       paths.push(`libraries/${file}`);
+    }
+
+    if (manifest.minecraft.libraries) {
+      paths.push(manifest.minecraft.libraries);
     }
 
     paths.push(
@@ -525,7 +530,7 @@ async function runCmd(args: string[], cache: Cache): Promise<boolean> {
           .replaceAll("${assets_index_name}", gameManifest!.assetIndex.id)
           .replaceAll("${auth_uuid}", uuid)
           .replaceAll("${auth_access_token}", accessToken)
-          .replaceAll("${clientid}", clientId)
+          .replaceAll("${clientid}", "mcli")
           .replaceAll("${auth_xuid}", xuid)
           .replaceAll("${version_type}", gameManifest!.type),
       );
@@ -558,7 +563,7 @@ async function runCmd(args: string[], cache: Cache): Promise<boolean> {
     }
   }
 
-  execArgs.push(gameManifest.mainClass);
+  execArgs.push(mainClass);
 
   for (const arg of gameManifest.arguments.game) {
     if (typeof arg === "string") {
@@ -578,7 +583,10 @@ async function runCmd(args: string[], cache: Cache): Promise<boolean> {
     }
   }
 
-  Bun.spawn(execArgs);
+  Bun.spawn(execArgs, {
+    stderr: 'inherit',
+    stdout: 'inherit',
+  });
 
   return true;
 }
