@@ -262,25 +262,17 @@ async function syncCmd(args: string[], cache: Cache): Promise<boolean> {
         `Fetching the game client from '${gameManifest.downloads.client.url}'`,
       );
 
-      try {
-        const response = await fetch(gameManifest.downloads.client.url);
+      const response = await fetch(gameManifest.downloads.client.url);
 
-        if (response.body === null) {
-          console.error(
-            `Response from '${gameManifest.downloads.client.url}' returned null`,
-          );
-
-          return false;
-        }
-
-        await cache.saveStream(cachePath, response.body);
-      } catch (err) {
+      if (response.body === null) {
         console.error(
-          `Failed to download the game client from '${gameManifest.downloads.client.url}': ${err}`,
+          `Response from '${gameManifest.downloads.client.url}' returned null`,
         );
 
         return false;
       }
+
+      await cache.saveStream(cachePath, response.body);
     }
 
     await cache.copy(cachePath, dstPath, null);
@@ -315,25 +307,17 @@ async function syncCmd(args: string[], cache: Cache): Promise<boolean> {
           `Fetching the library '${library.downloads.artifact.path}' from '${library.downloads.artifact.url}'`,
         );
 
-        try {
-          const response = await fetch(library.downloads.artifact.url);
+        const response = await fetch(library.downloads.artifact.url);
 
-          if (response.body === null) {
-            console.error(
-              `Response from '${library.downloads.artifact.url}' returned null`,
-            );
-
-            return false;
-          }
-
-          await cache.saveStream(cachePath, response.body);
-        } catch (err) {
+        if (response.body === null) {
           console.error(
-            `Failed to download the library '${library.downloads.artifact.path}' from '${library.downloads.artifact.url}': ${err}`,
+            `Response from '${library.downloads.artifact.url}' returned null`,
           );
 
           return false;
         }
+
+        await cache.saveStream(cachePath, response.body);
       }
 
       await cache.copy(cachePath, dstPath, null);
@@ -358,25 +342,17 @@ async function syncCmd(args: string[], cache: Cache): Promise<boolean> {
         `Fetching the assets index from '${gameManifest.assetIndex.url}'`,
       );
 
-      try {
-        const response = await fetch(gameManifest.assetIndex.url);
+      const response = await fetch(gameManifest.assetIndex.url);
 
-        if (response.body === null) {
-          console.error(
-            `Response from '${gameManifest.assetIndex.url}' returned null`,
-          );
-
-          return false;
-        }
-
-        await cache.saveStream(cachePath, response.body);
-      } catch (err) {
+      if (response.body === null) {
         console.error(
-          `Failed to fetch the assets index from '${gameManifest.assetIndex.url}': ${err}`,
+          `Response from '${gameManifest.assetIndex.url}' returned null`,
         );
 
         return false;
       }
+
+      await cache.saveStream(cachePath, response.body);
     }
 
     await cache.copy(cachePath, dstPath, null);
@@ -403,25 +379,17 @@ async function syncCmd(args: string[], cache: Cache): Promise<boolean> {
       if (!(await cache.copy(cachePath, dstPath, object.hash))) {
         const url = `${mojang.ASSET_ENDPOINT}/${objectPath}`;
 
-        console.debug(`Fetching the object '${key} from '${url}'`);
+        console.debug(`Fetching the object '${key}' from '${url}'`);
 
-        try {
-          const response = await fetch(url);
+        const response = await fetch(url);
 
-          if (response.body === null) {
-            console.error(`Response from '${url}' returned null`);
-
-            return false;
-          }
-
-          await cache.saveStream(cachePath, response.body);
-        } catch (err) {
-          console.error(
-            `Failed to fetch the object '${key}' from '${url}': ${err}`,
-          );
+        if (response.body === null) {
+          console.error(`Response from '${url}' returned null`);
 
           return false;
         }
+
+        await cache.saveStream(cachePath, response.body);
       }
 
       await cache.copy(cachePath, dstPath, null);
@@ -584,8 +552,8 @@ async function runCmd(args: string[], cache: Cache): Promise<boolean> {
   }
 
   Bun.spawn(execArgs, {
-    stderr: 'inherit',
-    stdout: 'inherit',
+    stderr: "inherit",
+    stdout: "inherit",
   });
 
   return true;
